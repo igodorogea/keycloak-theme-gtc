@@ -1,0 +1,40 @@
+---
+name: "tagged-release"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  gh_tagged_release:
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout source code"
+        uses: "actions/checkout@v1"
+        with:
+          lfs: true
+      - run: |
+          rm -rf /tmp/keycloak-theme
+          mkdir -p /tmp/keycloak-theme/theme/gtc
+          mkdir -p /tmp/keycloak-theme/META-INF
+          touch /tmp/keycloak-theme/META-INF/keycloak-themes.json
+          cat <<EOT >> /tmp/keycloak-theme/META-INF/keycloak-themes.json
+          {
+              "themes": [{
+                  "name" : "gtc",
+                  "types": [ "login" ]
+              }]
+          }
+          EOT
+          cp -a . /tmp/keycloak-theme/theme/gtc
+          rm -rf /tmp/keycloak-theme/theme/gtc/.git*
+          jar cvf gtctheme.jar -C /tmp/keycloak-theme .
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            gtctheme.jar
+        id: "automatic_releases"
