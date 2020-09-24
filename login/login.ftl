@@ -96,6 +96,12 @@
         <div id="gtc-request-guaranty"><span><a tabindex="6"
                         href="<#if client.baseUrl?has_content>${client.baseUrl}</#if>request-guarantee">Request guarantee</a></span>
         </div>
+        <script>
+            var params = window.location.search.replace(/^\?/, '').split('&');
+            var redirectUrlEnc = params.find(function(p) { return p.indexOf('redirect_uri') === 0}).replace('redirect_uri=', '');
+            var redirectUrl = new URL('/request-guarantee', decodeURIComponent(redirectUrlEnc));
+            document.querySelector('#gtc-request-guaranty a').setAttribute('href', redirectUrl);
+        </script>
     <#elseif section = "info" >
         <#if realm.password && realm.registrationAllowed && !registrationDisabled??>
             <div id="kc-registration">
